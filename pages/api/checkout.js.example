@@ -1,0 +1,59 @@
+/**
+ * Example Stripe Checkout API Route
+ * 
+ * This is an OPTIONAL example of how to create a custom backend
+ * for Stripe checkout. Only use this if you need advanced features.
+ * 
+ * To use this file:
+ * 1. Rename it from checkout.js.example to checkout.js
+ * 2. Install Stripe server library: npm install stripe
+ * 3. Add STRIPE_SECRET_KEY to your .env.local
+ * 4. Create a product and price in Stripe Dashboard
+ * 5. Replace 'price_YOUR_PRICE_ID' below with your actual price ID
+ * 6. Uncomment the API route code in /lib/stripe.js
+ */
+
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+export default async function handler(req, res) {
+  if (req.method === 'POST') {
+    try {
+      const { answers } = req.body;
+
+      // Create Checkout Session
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: 'price_YOUR_PRICE_ID', // Replace with your price ID
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${req.headers.origin}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.headers.origin}/questionnaire`,
+        // Store questionnaire answers in Stripe metadata
+        metadata: {
+          // Note: Stripe metadata has a 500 char limit per field
+          // For large answers, save to your database instead
+          shape: answers.shape || '',
+          size: JSON.stringify(answers.size) || '',
+          design: (answers.design || '').substring(0, 500),
+        },
+        // Or use client_reference_id to link to your database
+        client_reference_id: 'order_id_from_your_database',
+      });
+
+      // Optionally: Save order to your database here
+      // await saveOrderToDatabase({ answers, stripeSessionId: session.id });
+
+      res.status(200).json({ sessionId: session.id });
+    } catch (err) {
+      console.error('Stripe API error:', err);
+      res.status(500).json({ error: err.message });
+    }
+  } else {
+    res.setHeader('Allow', 'POST');
+    res.status(405).end('Method Not Allowed');
+  }
+}
