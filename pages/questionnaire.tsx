@@ -147,9 +147,9 @@ export default function Questionnaire() {
         <p>Step {getStepNumber()} of {totalSteps}</p>
 
         {/* Progress indicator */}
-        <div>
-          <div style={{ width: `${(getStepNumber() / totalSteps) * 100}%` }}>
-            {Math.round((getStepNumber() / totalSteps) * 100)}%
+        <div className="progress-container">
+          <div className="progress-bar" style={{ width: `${(getStepNumber() / totalSteps) * 100}%` }}>
+            <span>{Math.round((getStepNumber() / totalSteps) * 100)}%</span>
           </div>
         </div>
 
