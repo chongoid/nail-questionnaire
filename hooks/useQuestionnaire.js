@@ -1,27 +1,35 @@
-import { useState } from 'react';
-
 /**
- * Custom hook for managing questionnaire state
+ * useQuestionnaire Hook
  * 
- * This hook manages:
- * - Current step in the questionnaire
- * - All answers collected from the user
- * - Navigation between steps
+ * Manages state for a multi-step questionnaire.
  * 
- * HOW TO ADD NEW QUESTIONS:
- * 1. Add a new question component in /components/questionnaire/
- * 2. Import and add it to the questions array in questionnaire.js
- * 3. The hook will automatically track the answer using the question's ID
+ * Usage:
+ * const { currentStep, answers, saveAnswer, nextStep, prevStep, isFirst, isLast } = useQuestionnaire(totalQuestions);
  */
-export default function useQuestionnaire(totalSteps) {
+import { useState, useEffect } from 'react';
+
+export default function useQuestionnaire(totalQuestions) {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState({});
 
-  /**
-   * Save an answer for a specific question
-   * @param {string} questionId - Unique identifier for the question
-   * @param {any} value - The answer value
-   */
+  // Load saved answers from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('questionnaire_answers');
+    if (saved) {
+      try {
+        setAnswers(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to parse saved answers:', e);
+      }
+    }
+  }, []);
+
+  // Save answers to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('questionnaire_answers', JSON.stringify(answers));
+  }, [answers]);
+
+  // Save an answer for a specific question
   const saveAnswer = (questionId, value) => {
     setAnswers(prev => ({
       ...prev,
@@ -29,33 +37,21 @@ export default function useQuestionnaire(totalSteps) {
     }));
   };
 
-  /**
-   * Move to the next step
-   */
+  // Go to next step
   const nextStep = () => {
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep(prev => prev + 1);
-    }
+    setCurrentStep(prev => Math.min(prev + 1, totalQuestions - 1));
   };
 
-  /**
-   * Move to the previous step
-   */
+  // Go to previous step
   const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
-    }
+    setCurrentStep(prev => Math.max(prev - 1, 0));
   };
 
-  /**
-   * Check if current step is the first
-   */
+  // Check if on first step
   const isFirst = currentStep === 0;
 
-  /**
-   * Check if current step is the last
-   */
-  const isLast = currentStep === totalSteps - 1;
+  // Check if on last step
+  const isLast = currentStep === totalQuestions - 1;
 
   return {
     currentStep,
@@ -64,6 +60,6 @@ export default function useQuestionnaire(totalSteps) {
     nextStep,
     prevStep,
     isFirst,
-    isLast,
+    isLast
   };
 }

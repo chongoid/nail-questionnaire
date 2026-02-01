@@ -1,3 +1,24 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* 
+ * Global Styles
+ * 
+ * Add your global styles here. This file is imported in _app.js.
+ * 
+ * To add luxury fonts, add Google Fonts links to your _document.js or _app.js head,
+ * then apply fonts here or in the Layout component.
+ */
+
+/* Example: Apply a base font */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* 
+ * LUXURY FONT CLASSES (add to elements as needed):
+ * 
+ * .font-playfair { font-family: 'Playfair Display', serif; }
+ * .font-cormorant { font-family: 'Cormorant Garamond', serif; }
+ * .font-montserrat { font-family: 'Montserrat', sans-serif; }
+ * .font-cinzel { font-family: 'Cinzel', serif; }
+ * .font-bodoni { font-family: 'Bodoni Moda', serif; }
+ */
