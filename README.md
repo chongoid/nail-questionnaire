@@ -1,6 +1,6 @@
 # Nail Questionnaire
 
-A minimal Next.js multi-step questionnaire for custom press-on nail orders.
+A TypeScript Next.js multi-step questionnaire for custom press-on nail orders.
 
 ## Quick Start
 
@@ -13,48 +13,62 @@ npm run dev
 
 Visit http://localhost:3000
 
+## Tech Stack
+
+- Next.js 14 (App Router ready)
+- TypeScript
+- Stripe integration ready
+
 ## Project Structure
 
 ```
 nail-questionnaire/
 ├── components/
-│   ├── Layout.js           # Global layout wrapper for styling
+│   ├── Layout.tsx              # Global layout wrapper for styling
 │   └── questionnaire/
-│       ├── QuestionShape.js
-│       ├── QuestionSize.js
-│       └── QuestionDesign.js
+│       ├── QuestionShape.tsx
+│       ├── QuestionSize.tsx
+│       └── QuestionDesign.tsx
 ├── hooks/
-│   └── useQuestionnaire.js # State management for questionnaire
+│   └── useQuestionnaire.ts     # State management for questionnaire
 ├── lib/
-│   └── stripe.js           # Stripe checkout integration
+│   └── stripe.ts               # Stripe checkout integration
 ├── pages/
-│   ├── _app.js
-│   ├── index.js            # Landing page
-│   ├── questionnaire.js    # Main questionnaire
-│   └── thank-you.js        # Confirmation page
-└── styles/
-    └── globals.css         # Global styles
+│   ├── _app.tsx
+│   ├── _document.tsx           # Google Fonts loaded here
+│   ├── index.tsx               # Landing page with font examples
+│   ├── questionnaire.tsx       # Main questionnaire
+│   └── thank-you.tsx           # Confirmation page
+├── styles/
+│   └── globals.css             # Global styles + font classes
+├── tsconfig.json               # TypeScript configuration
+└── next.config.js
 ```
 
 ## How to Add a New Question
 
 1. Create a new component in `/components/questionnaire/`:
 
-```jsx
-// components/questionnaire/QuestionColor.js
+```tsx
+// components/questionnaire/QuestionColor.tsx
 
-// Required: Label for review screen
+import React from 'react';
+
+interface QuestionColorProps {
+  value: string | undefined;
+  onChange: (value: string) => void;
+}
+
 QuestionColor.label = 'Color Scheme';
 
-// Required: Review component to display answer
-QuestionColor.Review = function QuestionColorReview({ value }) {
+QuestionColor.Review = function QuestionColorReview({ value }: { value?: string }) {
   return <span>{value || 'Not selected'}</span>;
 };
 
-export default function QuestionColor({ value, onChange }) {
+export default function QuestionColor({ value, onChange }: QuestionColorProps) {
   return (
     <div>
-      <h2>What colors do you want?</h2>
+      <h2>What color scheme do you prefer?</h2>
       <input
         type="text"
         value={value || ''}
@@ -65,12 +79,12 @@ export default function QuestionColor({ value, onChange }) {
 }
 ```
 
-2. Import and add to the questions array in `pages/questionnaire.js`:
+2. Import and add to the questions array in `pages/questionnaire.tsx`:
 
-```jsx
+```tsx
 import QuestionColor from '../components/questionnaire/QuestionColor';
 
-const questions = [
+const questions: Question[] = [
   // ... existing questions
   {
     id: 'color',
@@ -79,17 +93,22 @@ const questions = [
 ];
 ```
 
-## Luxury Fonts
+## Luxury Fonts Included
 
-The Layout component includes documentation for luxury fonts from Google Fonts:
+All fonts are loaded via Google Fonts in `_document.tsx`:
 
 - **Playfair Display** - Elegant serif
 - **Cormorant Garamond** - Refined classic serif
-- **Montserrat** - Clean modern sans-serif
 - **Cinzel** - Fashion-forward serif
 - **Bodoni Moda** - High-contrast luxury serif
+- **Montserrat** - Clean modern sans-serif
 
-See `/components/Layout.js` for implementation instructions.
+Font classes are defined in `globals.css`:
+
+```tsx
+<h1 className="font-playfair">Luxury Heading</h1>
+<p className="font-montserrat">Clean body text</p>
+```
 
 ## Stripe Setup
 
@@ -104,4 +123,4 @@ npm run build
 npm start
 ```
 
-Or deploy to Vercel/Netlify for automatic deployments.
+Or deploy to Vercel for automatic TypeScript builds.
